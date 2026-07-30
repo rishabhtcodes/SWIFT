@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, Bot, Brain, BookOpen,
-  Wrench, FolderKanban, CheckSquare, Files, Settings,
-  Cpu, Activity, HardDrive
+  Wrench, FolderKanban, Settings, Cpu, Store, Activity, Terminal
 } from 'lucide-react';
 
 const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_URL) || 'http://localhost:8000/api/v1';
 
 const NAV = [
-  { to: '/dashboard', label: 'DASHBOARD', icon: LayoutDashboard },
-  { to: '/chat',      label: 'CHAT',      icon: MessageSquare },
-  { to: '/agents',    label: 'AGENTS',    icon: Bot },
-  { to: '/memory',    label: 'MEMORY',    icon: Brain },
-  { to: '/knowledge', label: 'KNOWLEDGE BASE', icon: BookOpen },
-  { to: '/tools',     label: 'TOOLS',     icon: Wrench },
-  { to: '/projects',  label: 'PROJECTS',  icon: FolderKanban },
-  { to: '/settings',  label: 'SETTINGS',  icon: Settings },
+  { to: '/dashboard',   label: 'DASHBOARD',     icon: LayoutDashboard },
+  { to: '/chat',        label: 'CHAT',          icon: MessageSquare },
+  { to: '/agents',      label: 'AGENTS',        icon: Bot },
+  { to: '/memory',      label: 'MEMORY',        icon: Brain },
+  { to: '/knowledge',   label: 'KNOWLEDGE BASE', icon: BookOpen },
+  { to: '/tools',       label: 'TOOLS',         icon: Wrench },
+  { to: '/projects',    label: 'PROJECTS',      icon: FolderKanban },
+  { to: '/models',      label: 'MODEL MANAGER', icon: Cpu },
+  { to: '/marketplace', label: 'MARKETPLACE',   icon: Store },
+  { to: '/analytics',   label: 'ANALYTICS',     icon: Activity },
+  { to: '/console',     label: 'CONSOLE',       icon: Terminal },
+  { to: '/settings',    label: 'SETTINGS',      icon: Settings },
 ];
 
 export function Sidebar() {
