@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, AsyncIterator
 import json
+import re
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
@@ -41,10 +42,57 @@ AGENT_MAP = {
 }
 
 
+def _extract_clean_text(raw: str) -> str:
+    """
+    Extract the clean human-readable answer from a raw LLM response.
+    Handles:
+      - JSON with {"decision": ..., "answer": "..."}
+      - Markdown code-fenced JSON ```json { ... } ```
+      - Plain text (returned as-is)
+    """
+    if not raw:
+        return raw
+
+    text = raw.strip()
+
+    # Strip ```json ... ``` or ``` ... ``` wrappers
+    fenced = re.match(r"^```(?:json)?\s*\n?(.*?)\n?```$", text, re.DOTALL)
+    if fenced:
+        text = fenced.group(1).strip()
+
+    # Try parsing as JSON
+    if text.startswith("{"):
+        try:
+            parsed = json.loads(text)
+            # Unwrap nested "answer" key if present
+            answer = parsed.get("answer", text)
+            if isinstance(answer, str):
+                # Recursively unwrap one more level if still JSON
+                if answer.strip().startswith("{"):
+                    try:
+                        inner = json.loads(answer)
+                        answer = inner.get("answer", answer)
+                    except Exception:
+                        pass
+                return answer
+        except Exception:
+            pass  # Not valid JSON — fall through
+
+    return text
+
+
 class Orchestrator:
     """LangGraph-style stateful orchestrator with conditional routing."""
 
-    async def run(self, user_id: UUID, project_id: UUID | None, user_message: str, session: AsyncSession, image_base64: str | None = None, document_id: str | None = None) -> dict[str, Any]:
+    async def run(
+        self,
+        user_id: UUID,
+        project_id: UUID | None,
+        user_message: str,
+        session: AsyncSession,
+        image_base64: str | None = None,
+        document_id: str | None = None,
+    ) -> dict[str, Any]:
         state = GraphState(
             user_id=user_id,
             project_id=project_id,
@@ -64,9 +112,7 @@ class Orchestrator:
                 state.error = f"Unknown agent: {current}"
                 break
 
-            # Persist run start
             run = await agent_service.start_run(user_id, project_id, current, state.user_message)
-
             try:
                 result = await agent.run(state, session)
                 await agent_service.finish_run(run.id, status="completed", output=result)
@@ -77,11 +123,9 @@ class Orchestrator:
 
             next_node = result.get("next", "end")
 
-            # Conditional routing
             if current == "ceo" and next_node == "planner":
                 current = "planner"
             elif current == "planner" and next_node == "executor":
-                # Execute tasks in parallel (simplified: sequential here)
                 for task in list(state.active_tasks.values()):
                     task.status = "running"
                     task_agent = AGENT_MAP.get(task.assigned_agent, coding_agent)
@@ -91,24 +135,38 @@ class Orchestrator:
                         user_message=f"{task.title}\n\n{task.description}",
                         messages=state.messages.copy(),
                     )
-                    await task_agent.run(sub_state, session)
+                    try:
+                        await task_agent.run(sub_state, session)
+                    except Exception:
+                        pass
                     task.status = "done"
-                    task.result = sub_state.messages[-1].content if sub_state.messages else ""
+                    # Extract CLEAN text from sub-agent result
+                    raw_result = sub_state.messages[-1].content if sub_state.messages else ""
+                    task.result = _extract_clean_text(raw_result)
                     state.completed_tasks[task.id] = task
-                current = "ceo"  # Return to CEO for synthesis
-            elif current == "ceo" and not state.final_answer and state.completed_tasks:
-                # Synthesize
-                synthesis_prompt = "Synthesize these completed task results into a final answer:\n" + "\n".join(
-                    f"- [{t.title}]: {t.result}" for t in state.completed_tasks.values()
-                )
-                state.user_message = synthesis_prompt
                 current = "ceo"
+            elif current == "ceo" and not state.final_answer and state.completed_tasks:
+                # Direct synthesis — no extra CEO call, just concatenate task results cleanly
+                parts = []
+                for t in state.completed_tasks.values():
+                    clean = _extract_clean_text(t.result or "")
+                    if clean:
+                        parts.append(f"**{t.title}**\n{clean}")
+                state.final_answer = "\n\n".join(parts) if parts else "Task completed."
+                state.completed_tasks = {}
+                current = "end"
             elif next_node == "end" or (current == "ceo" and state.final_answer):
+                # Ensure final_answer is always clean
+                if state.final_answer:
+                    state.final_answer = _extract_clean_text(state.final_answer)
                 current = "end"
             else:
                 current = next_node
 
-        # Learning step: extract lessons
+        # Clean final_answer one last time before returning
+        if state.final_answer:
+            state.final_answer = _extract_clean_text(state.final_answer)
+
         try:
             await learning_agent.run(state, session)
         except Exception:
@@ -121,7 +179,15 @@ class Orchestrator:
             "model_used": state.model_used,
         }
 
-    async def stream(self, user_id: UUID, project_id: UUID | None, user_message: str, session: AsyncSession, image_base64: str | None = None, document_id: str | None = None) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        user_id: UUID,
+        project_id: UUID | None,
+        user_message: str,
+        session: AsyncSession,
+        image_base64: str | None = None,
+        document_id: str | None = None,
+    ) -> AsyncIterator[str]:
         """SSE streaming wrapper around run()."""
         state = GraphState(
             user_id=user_id,
@@ -133,12 +199,14 @@ class Orchestrator:
         )
         yield json.dumps({"type": "start", "message": user_message})
         current = "ceo"
+
         while current != "end" and state.iteration < state.max_iterations:
             state.iteration += 1
             state.current_agent = current
             agent = AGENT_MAP.get(current)
             if not agent:
                 break
+
             yield json.dumps({"type": "agent_start", "agent": current})
             try:
                 result = await agent.run(state, session)
@@ -146,6 +214,7 @@ class Orchestrator:
             except Exception as e:
                 yield json.dumps({"type": "error", "error": str(e)})
                 break
+
             next_node = result.get("next", "end")
 
             if current == "ceo" and next_node == "planner":
@@ -163,24 +232,36 @@ class Orchestrator:
                     yield json.dumps({"type": "agent_start", "agent": task.assigned_agent})
                     try:
                         await task_agent.run(sub_state, session)
-                    except Exception:
-                        pass
+                    except Exception as sub_exc:
+                        yield json.dumps({"type": "error", "error": str(sub_exc)})
                     task.status = "done"
-                    task.result = sub_state.messages[-1].content if sub_state.messages else ""
+                    raw_result = sub_state.messages[-1].content if sub_state.messages else ""
+                    task.result = _extract_clean_text(raw_result)
                     state.completed_tasks[task.id] = task
                 current = "ceo"
+
             elif current == "ceo" and not state.final_answer and state.completed_tasks:
-                synthesis_prompt = "Synthesize these completed task results into a final answer:\n" + "\n".join(
-                    f"- [{t.title}]: {t.result}" for t in state.completed_tasks.values()
-                )
-                state.user_message = synthesis_prompt
-                # Reset completed tasks so it doesn't loop forever
+                # Direct clean synthesis — skip extra CEO API call to save rate limit
+                parts = []
+                for t in state.completed_tasks.values():
+                    clean = _extract_clean_text(t.result or "")
+                    if clean:
+                        parts.append(f"**{t.title}**\n{clean}")
+                state.final_answer = "\n\n".join(parts) if parts else "Task completed."
                 state.completed_tasks = {}
-                current = "ceo"
+                current = "end"
+
             elif next_node == "end" or (current == "ceo" and state.final_answer):
+                if state.final_answer:
+                    state.final_answer = _extract_clean_text(state.final_answer)
                 current = "end"
             else:
                 current = next_node
+
+        # Final cleanup pass
+        if state.final_answer:
+            state.final_answer = _extract_clean_text(state.final_answer)
+
         yield json.dumps({"type": "done", "answer": state.final_answer or "Completed."})
 
 
