@@ -1,116 +1,176 @@
-# Swift AI OS 🚀
+<div align="center">
 
-**Swift AI OS** is a production-ready, personal AI Operating System and multi-agent orchestration platform designed for autonomous software engineering, reasoning, memory, RAG, and tool execution.
+```
+  ██████╗  ██╗██╗  ██╗██╗███████╗████████╗     █████╗ ██╗     ██████╗ ███████╗
+ ██╔════╝  ██║██║  ██║██║██╔════╝╚══██╔══╝    ██╔══██╗██║    ██╔═══██╗██╔════╝
+ ╚█████╗   ██║██║  ██║██║█████╗     ██║       ███████║██║    ██║   ██║███████╗
+  ╚═══██╗  ██║██║  ██║██║██╔══╝     ██║       ██╔══██║██║    ██║   ██║╚════██║
+ ██████╔╝  ██║╚█████╔╝██║██║        ██║       ██║  ██║██║    ╚██████╔╝███████║
+ ╚═════╝   ╚═╝ ╚════╝ ╚═╝╚═╝        ╚═╝       ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝
+```
 
----
+### ⚡ Autonomous Multi-Agent AI Operating System
 
-## 🌟 Key Architecture & Features
-
-- **14 Specialized AI Agents**:
-  - `CEO Agent` (Supervisor / Orchestrator)
-  - `Planner Agent` (Task decomposition)
-  - `Coding Agent`, `Research Agent`, `Vision Agent`, `Memory Agent`, `Learning Agent`, `Deployment Agent`, `Testing Agent`, `Documentation Agent`, `Database Agent`, `Frontend Agent`, `Backend Agent`, `DevOps Agent`
-- **7-Layer Memory System**:
-  1. Short-Term Memory (Redis TTL)
-  2. Long-Term Memory (PostgreSQL)
-  3. Semantic Memory (pgvector embeddings)
-  4. Conversation Memory
-  5. Project Memory
-  6. User Preference Memory
-  7. Learning Memory
-- **Pluggable Model Router**:
-  - Hot-swappable providers: **Groq** (Llama 3.1 70B/8B), **Google Gemini 1.5 Flash**, **Ollama**, **DeepSeek**, **Qwen**, **OpenAI**, **Anthropic**.
-- **RAG Knowledge Pipeline**:
-  - Supports PDF, Word, PowerPoint, Excel, CSV, Markdown, Web URLs, and GitHub ZIP repositories with citation mapping.
-- **Sandboxed Tool Ecosystem**:
-  - Filesystem, Terminal Shell, Sandboxed Python Executor, Web Scraper/Browser, Calculator, Docker, and GitHub integrations.
-- **Software Engineering Mode**:
-  - Give high-level goals like *"Build Spotify clone"* and watch 14 agents plan, generate database schemas, write backend APIs, build React UIs, execute tests, and package Docker deployment automatically.
+*An intelligent, self-orchestrating personal AI Operating System designed for complex reasoning, autonomous software engineering, tool execution, multi-model routing, and knowledge retrieval.*
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, Vite, TypeScript, TailwindCSS, Framer Motion, React Router, TanStack Query, Lucide Icons.
-- **Backend**: Python 3.12, FastAPI (Async), SQLAlchemy 2.0 (Async ORM), Alembic, Pydantic v2.
-- **AI & DB**: LangGraph, LangChain, PostgreSQL 16 (with `pgvector`), Redis, ChromaDB.
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/Frontend-React_18-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Language-Python_3.12-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+[![LangGraph](https://img.shields.io/badge/Orchestrator-LangGraph-FF6F61?style=for-the-badge)](https://www.langchain.com/)
+[![TailwindCSS](https://img.shields.io/badge/Style-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
 ---
 
-## 🚀 Quickstart Guide
+</div>
 
-### 1. Prerequisites
-- Docker & Docker Compose
-- Python 3.12+
-- Node.js 18+ & npm
+> [!NOTE]
+> **PERSONAL & NON-COMMERCIAL USE NOTICE**
+> 
+> **Swift AI OS** is a **personalized, non-commercial research & engineering project** created and developed by **Rishabh** ([@rishabhtcodes](https://github.com/rishabhtcodes)). It is built strictly for personal productivity, experimentation, and educational demonstration. It is **NOT** intended for commercial resale, SaaS monetization, or corporate deployment by third parties.
 
-### 2. Single-Command Startup 🚀
+---
 
-Inside the `SWIFT` folder, simply run:
+## 🌌 Overview
 
-**On Windows (CMD / PowerShell):**
+**Swift AI OS** acts as an autonomous personal engineering AI operating system (JARVIS-class system). Unlike standard single-chat interfaces, Swift AI OS deploys a **graph of 14 specialized AI agents** that work together concurrently to analyze, decompose, design, code, test, document, and deploy full applications.
+
+```
+                  ┌─────────────────────────────────────┐
+                  │              USER GOAL              │
+                  └──────────────────┬──────────────────┘
+                                     │
+                                     ▼
+                          ┌─────────────────────┐
+                          │      CEO AGENT      │
+                          └──────────┬──────────┘
+                                     │
+                                     ▼
+                          ┌─────────────────────┐
+                          │    PLANNER AGENT    │
+                          └──────────┬──────────┘
+                                     │
+         ┌───────────────────────────┼───────────────────────────┐
+         ▼                           ▼                           ▼
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│  BACKEND AGENT   │       │  FRONTEND AGENT  │       │  DATABASE AGENT  │
+└────────┬─────────┘       └────────┬─────────┘       └────────┬─────────┘
+         │                           │                           │
+         └───────────────────────────┼───────────────────────────┘
+                                     │
+                                     ▼
+                          ┌─────────────────────┐
+                          │  TESTING & DEVOPS   │
+                          └──────────┬──────────┘
+                                     │
+                                     ▼
+                          ┌─────────────────────┐
+                          │   FINAL SYNTHESIS   │
+                          └─────────────────────┘
+```
+
+---
+
+## 🤖 The 14 Specialist Agents
+
+Every agent operates with explicit status tracking, execution logs, memory retrieval, and sandboxed tool access:
+
+1. 👑 **CEO Agent** — High-level intent analysis, delegation, and final answer synthesis.
+2. 🗺️ **Planner Agent** — Architecture design, sprint breakdown, and dependency resolution.
+3. 💻 **Coding Agent** — Core multi-language software engineering and file generation.
+4. ⚙️ **Backend Agent** — FastAPI microservices, REST APIs, and dependency injection.
+5. 🎨 **Frontend Agent** — React 18, TypeScript, Tailwind CSS, and Framer Motion components.
+6. 🗄️ **Database Agent** — PostgreSQL schemas, indexes, and vector store configurations.
+7. 🧪 **Testing Agent** — Automated unit test suites (PyTest / Jest / Vitest).
+8. 🚀 **Deployment Agent** — Vercel, Render, and production build pipelines.
+9. 🛡️ **DevOps Agent** — Dockerfiles, `docker-compose.yml`, and CI/CD security.
+10. 🔍 **Research Agent** — Real-time web scraping, browser automation, and document synthesis.
+11. 👁️ **Vision Agent** — Multimodal image analysis using Qwen VL & Gemini Vision.
+12. 🧠 **Memory Agent** — Multi-tiered memory indexing (short-term, long-term, semantic).
+13. 🎓 **Learning Agent** — Continuous self-improvement and lesson extraction.
+14. 📝 **Docs Agent** — OpenAPI specs, architecture documentation, and README generation.
+
+---
+
+## 🔌 Pluggable Model Router & Manager
+
+No single model is hardcoded. Swift AI OS dynamically routes tasks based on capabilities (**reasoning**, **coding**, **vision**, **planning**, **RAG**, **translation**):
+
+- 🔴 **DashScope / Qwen**: `qwen3.7-plus`, `qwen-vl-plus`, `qwen-plus`
+- ⚡ **Groq**: `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768`
+- ♊ **Google Gemini**: `gemini-2.0-flash`, `gemini-1.5-pro`
+- 🐋 **DeepSeek**: `deepseek-chat` (V3)
+- 🦙 **Ollama**: Local models (`llama3.2`)
+- 🤖 **OpenAI & Anthropic**: `gpt-4o`, `claude-3.5-sonnet` (Optional via keys)
+
+---
+
+## 💻 Tech Stack & Architecture
+
+```
+Swift AI OS Architecture
+├── Frontend (React 18 + Vite + TypeScript + TailwindCSS + TanStack Query + Framer Motion)
+├── Backend (Python 3.12 + FastAPI + SQLAlchemy 2.0 Async + Pydantic v2)
+├── Multi-Agent Engine (LangGraph + Custom Tool Loop + Model Router)
+├── Storage & Vector DB (PostgreSQL 16 + pgvector + Redis + ChromaDB)
+└── Execution Sandbox (Workspace Filesystem + Python Executor + Subprocess Shell)
+```
+
+---
+
+## 🚀 Quickstart & One-Click Launch
+
+### Single-Command Startup (Windows / Linux / macOS)
+
+Run the automated launcher script from the root directory:
+
+**Windows (CMD / PowerShell):**
 ```cmd
 .\start-swift.bat
 ```
 *(Or in PowerShell: `.\start-swift.ps1`)*
 
-**On Linux / macOS:**
+**Linux / macOS:**
 ```bash
 chmod +x start-swift.sh
 ./start-swift.sh
 ```
 
-This single command automatically:
-1. Runs database schema setup and migrations.
-2. Launches the FastAPI backend server on `http://localhost:8000`.
-3. Launches the Vite frontend development server on `http://localhost:5173`.
-
-### 3. Backend Setup
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-# Windows:
-.\venv\Scripts\Activate.ps1
-# Linux/macOS:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure Environment
-cp .env.example .env
-# Set your API keys in .env (e.g. GROQ_API_KEY, GOOGLE_API_KEY)
-
-# Run Database Migrations
-alembic init alembic
-alembic revision --autogenerate -m "Initial schema"
-alembic upgrade head
-
-# Start FastAPI server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 4. Frontend Setup
-```bash
-# In a new terminal window:
-cd frontend
-
-# Install dependencies
-npm install
-
-# Build & launch Vite development server
-npm run dev
-```
-
-- **Frontend Interface**: [http://localhost:5173](http://localhost:5173)
-- **Backend Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+This automatically initializes database tables, seeds default model registries, starts the FastAPI backend on `http://localhost:8000`, and launches the Vite frontend on `http://localhost:5173`.
 
 ---
 
-## 🔒 Security & Standards
+## 🌐 Application Navigation Pages
 
-- **JWT Authentication** with password hashing (`bcrypt`).
-- **Path Restrictions & Sandboxing** on file operations and terminal executions.
-- **Clean Architecture & SOLID Principles**: Service-Repository pattern with strict async execution.
+| Page | URL Route | Description |
+|---|---|---|
+| **Dashboard** | `/dashboard` | System overview, active agent runs, CPU/Memory telemetry |
+| **Chat / Assistant** | `/chat` | Interactive multi-agent conversational interface |
+| **Agents** | `/agents` | Overview & live status of all 14 specialist agents |
+| **Memory** | `/memory` | Semantic, conversation, and project memory inspector |
+| **Knowledge Base** | `/knowledge` | RAG document upload (PDF, Word, TXT, GitHub, Web URLs) |
+| **Tools** | `/tools` | Sandboxed tools catalog and execution runner |
+| **Projects** | `/projects` | Kanban task board, workspace file tree, and sprint progress |
+| **Model Manager** | `/models` | Pluggable LLM health checks, latency, priorities, and cost |
+| **Marketplace** | `/marketplace` | Discover community plugins, agent extensions, and tools |
+| **Analytics** | `/analytics` | Token usage breakdown, cost tracking, latency metrics |
+| **Developer Console**| `/console` | Real-time trace logs, active tool logs, shell runner |
+| **Settings** | `/settings` | Provider API keys configuration & system parameters |
+
+---
+
+## 👤 Developer & Maintainer
+
+- **Developer**: **Rishabh** ([@rishabhtcodes](https://github.com/rishabhtcodes))
+- **Project**: **Swift AI OS**
+- **License**: **Personal / Non-Commercial Use Only**
+
+---
+
+<div align="center">
+
+*Built with passion, caffeine, and modern AI engineering by Rishabh.* ⚡
+
+</div>
