@@ -27,10 +27,21 @@ Respond in JSON: {"decision": "direct"|"delegate", "answer": "...", "plan": [{"t
         state.model_used = thought["model"]
         state.messages.append(AgentMessage(role="assistant", content=thought["content"], agent=self.name))
         import json
+
+        raw = thought["content"].strip()
+
+        # Strip markdown code fences if model wrapped JSON in ```json ... ```
+        if raw.startswith("```"):
+            lines = raw.splitlines()
+            raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+
         try:
-            decision = json.loads(thought["content"])
+            decision = json.loads(raw)
         except Exception:
-            decision = {"decision": "direct", "answer": thought["content"]}
+            # Content is plain text — treat as direct answer
+            state.final_answer = raw
+            return {"next": "end"}
+
         if decision.get("decision") == "delegate" and decision.get("plan"):
             from app.ai.agents.state import Task
             for t in decision["plan"]:
@@ -38,7 +49,17 @@ Respond in JSON: {"decision": "direct"|"delegate", "answer": "...", "plan": [{"t
                 state.active_tasks[task.id] = task
             state.tasks_created = len(state.active_tasks)
             return {"next": "planner"}
-        state.final_answer = decision.get("answer", thought["content"])
+
+        # Extract clean answer text (never expose raw JSON to the user)
+        answer = decision.get("answer", raw)
+        # If answer is itself a JSON string, try to unwrap again
+        if isinstance(answer, str) and answer.strip().startswith("{"):
+            try:
+                inner = json.loads(answer)
+                answer = inner.get("answer", answer)
+            except Exception:
+                pass
+        state.final_answer = answer
         return {"next": "end"}
 
 
