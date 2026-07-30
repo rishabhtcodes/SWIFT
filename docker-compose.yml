@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: swift
+      POSTGRES_PASSWORD: swift
+      POSTGRES_DB: swift_ai_os
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swift"]
+      interval: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redisdata:/data"]
+
+  chroma:
+    image: chromadb/chroma:latest
+    ports: ["8001:8000"]
+    volumes: ["chromadata:/chroma/chroma"]
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://swift:swift@postgres:5432/swift_ai_os
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_URL: http://chroma:8000
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      QWEN_API_KEY: ${QWEN_API_KEY:-}
+    ports: ["8000:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }
+    volumes: ["workspace:/app/workspace"]
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    ports: ["5173:80"]
+    depends_on: [backend]
+
+volumes:
+  pgdata:
+  redisdata:
+  chromadata:
+  workspace:
