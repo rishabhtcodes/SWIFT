@@ -11,7 +11,7 @@ import { KnowledgeBase } from './pages/KnowledgeBase';
 import { Tools } from './pages/Tools';
 import { Projects } from './pages/Projects';
 import { Settings } from './pages/Settings';
-import { Models } from './pages/Models';
+import { ModelManager } from './pages/ModelManager';
 import { Console } from './pages/Console';
 import { Analytics } from './pages/Analytics';
 import { Marketplace } from './pages/Marketplace';
@@ -53,7 +53,7 @@ export default function App() {
                 <Route path="/tools" element={<Tools />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/models" element={<Models />} />
+                <Route path="/models" element={<ModelManager />} />
                 <Route path="/console" element={<Console />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/marketplace" element={<Marketplace />} />
