@@ -126,6 +126,7 @@ class Orchestrator:
             if current == "ceo" and next_node == "planner":
                 current = "planner"
             elif current == "planner" and next_node == "executor":
+                import asyncio
                 for task in list(state.active_tasks.values()):
                     task.status = "running"
                     task_agent = AGENT_MAP.get(task.assigned_agent, coding_agent)
@@ -136,6 +137,7 @@ class Orchestrator:
                         messages=state.messages.copy(),
                     )
                     try:
+                        await asyncio.sleep(1.0)  # Pacing delay to respect API rate limits
                         await task_agent.run(sub_state, session)
                     except Exception:
                         pass
