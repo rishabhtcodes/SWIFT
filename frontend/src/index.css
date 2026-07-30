@@ -66,7 +66,7 @@ html, body, #root {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
@@ -134,3 +134,20 @@ textarea::placeholder, input::placeholder { color: var(--text-muted); opacity: 0
 .truncate { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .uppercase { text-transform: uppercase; letter-spacing: 0.08em; }
 .scrollable { overflow-y: auto; }
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .mobile-stack { flex-direction: column !important; align-items: stretch !important; }
+  .mobile-grid-1 { grid-template-columns: 1fr !important; }
+  .mobile-scroll-x { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  
+  .sidebar-drawer {
+    position: fixed !important;
+    top: 48px;
+    left: 0;
+    bottom: 0;
+    z-index: 50 !important;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+  }
+}

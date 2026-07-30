@@ -1,157 +1,185 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Activity, Power, ChevronDown, Search, Plus } from "lucide-react";
-import { api } from "../services/api";
-import { ModelHealthBadge } from "../components/models/ModelHealthBadge";
-import type { Model } from "../types";
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Activity, Power, Search, Plus, Cpu, RotateCw } from 'lucide-react';
+import { api } from '../services/api';
+import { ModelHealthBadge } from '../components/models/ModelHealthBadge';
+import type { Model } from '../types';
 
 export function ModelManager() {
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "enabled" | "healthy">("all");
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<'all' | 'enabled' | 'healthy'>('all');
 
   const { data: models = [] } = useQuery<Model[]>({
-    queryKey: ["models"],
-    queryFn: () => api.get("/models/"),
+    queryKey: ['models'],
+    queryFn: () => api.get('/models/'),
   });
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) =>
       api.patch(`/models/${id}`, { is_enabled: enabled }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["models"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['models'] }),
   });
 
   const healthMutation = useMutation({
     mutationFn: (id: string) => api.post(`/models/${id}/health`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["models"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['models'] }),
   });
 
   const filtered = models.filter((m) => {
     if (search && !`${m.display_name} ${m.model_id} ${m.provider}`.toLowerCase().includes(search.toLowerCase())) return false;
-    if (filter === "enabled") return m.is_enabled;
-    if (filter === "healthy") return m.health_status === "healthy";
+    if (filter === 'enabled') return m.is_enabled;
+    if (filter === 'healthy') return m.health_status === 'healthy';
     return true;
   });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-semibold tracking-tight">Model Manager</h1>
-        <p className="mt-1 text-sm text-graphite-300">
-          Configure, monitor, and route between pluggable LLM providers.
-        </p>
-      </motion.div>
+    <div style={{ padding: 16 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-primary)' }}>MODEL MANAGER</h1>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+            Multi-provider AI model routing & telemetry • {models.filter(m => m.is_enabled).length} models enabled
+          </p>
+        </div>
+        <button
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['models'] })}
+          className="accent-btn"
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', fontSize: 10 }}
+        >
+          <RotateCw size={12} /> REFRESH
+        </button>
+      </div>
 
-      <div className="flex items-center gap-3">
-        <div className="glass flex flex-1 items-center gap-2 rounded-xl px-3 py-2">
-          <Search className="h-4 w-4 text-graphite-300" />
+      {/* Controls Bar */}
+      <div className="mobile-stack" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div style={{
+          flex: 1, display: 'flex', alignItems: 'center', gap: 8,
+          background: 'var(--bg-card)', border: '1px solid var(--border)',
+          borderRadius: 6, padding: '6px 10px', fontSize: 11
+        }}>
+          <Search size={14} color="var(--text-muted)" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search models, providers, capabilities..."
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-graphite-400"
+            placeholder="Search models, providers, or capabilities..."
+            style={{
+              flex: 1, background: 'none', border: 'none', outline: 'none',
+              color: 'var(--text-primary)', fontFamily: 'inherit', fontSize: 11
+            }}
           />
         </div>
-        <div className="glass flex rounded-xl p-1">
-          {(["all", "enabled", "healthy"] as const).map((f) => (
+
+        <div style={{ display: 'flex', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, padding: 2 }}>
+          {(['all', 'enabled', 'healthy'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-lg px-3 py-1.5 text-xs capitalize transition ${
-                filter === f ? "bg-white/10 text-white" : "text-graphite-300 hover:text-white"
-              }`}
+              style={{
+                border: 'none', background: filter === f ? 'var(--accent)' : 'transparent',
+                color: filter === f ? '#fff' : 'var(--text-muted)',
+                padding: '4px 10px', borderRadius: 4, fontSize: 9, fontWeight: 600,
+                letterSpacing: '0.06em', cursor: 'pointer', textTransform: 'uppercase',
+                transition: 'all 0.15s'
+              }}
             >
               {f}
             </button>
           ))}
         </div>
-        <button className="gradient-amber flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-ink-950 shadow-glow transition hover:opacity-90">
-          <Plus className="h-4 w-4" /> Register Model
-        </button>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="glass overflow-hidden rounded-2xl"
-      >
-        <table className="w-full text-sm">
+      {/* Models Table Container */}
+      <div className="card mobile-scroll-x" style={{ overflow: 'hidden' }}>
+        <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
-            <tr className="border-b border-white/5 text-left text-xs uppercase tracking-wider text-graphite-300">
-              <th className="px-5 py-3">Model</th>
-              <th className="px-5 py-3">Provider</th>
-              <th className="px-5 py-3">Health</th>
-              <th className="px-5 py-3">Latency</th>
-              <th className="px-5 py-3">Context</th>
-              <th className="px-5 py-3">Cost / 1M tokens</th>
-              <th className="px-5 py-3">Capabilities</th>
-              <th className="px-5 py-3">Priority</th>
-              <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3"></th>
+            <tr style={{ borderBottom: '1px solid var(--border)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+              <th style={{ padding: '12px 14px', fontWeight: 600 }}>MODEL</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600 }}>PROVIDER</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600 }}>HEALTH</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'right' }}>LATENCY</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'right' }}>CONTEXT</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'right' }}>COST / 1M</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600 }}>CAPABILITIES</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'center' }}>PRIORITY</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'center' }}>STATUS</th>
+              <th style={{ padding: '12px 14px', fontWeight: 600, textAlign: 'right' }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((m, i) => (
-              <motion.tr
+              <tr
                 key={m.id}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.02 }}
-                className="border-b border-white/5 last:border-0 transition hover:bg-white/[0.02]"
+                style={{
+                  borderBottom: i === filtered.length - 1 ? 'none' : '1px solid var(--border-light)',
+                  transition: 'background 0.15s'
+                }}
               >
-                <td className="px-5 py-3">
-                  <div className="font-medium">{m.display_name || m.model_id}</div>
-                  <div className="text-xs text-graphite-400">{m.model_id}</div>
+                <td style={{ padding: '10px 14px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)' }}>{m.display_name || m.model_id}</div>
+                  <div style={{ fontSize: 9, fontFamily: 'var(--mono)', color: 'var(--text-muted)', marginTop: 1 }}>{m.model_id}</div>
                 </td>
-                <td className="px-5 py-3 capitalize text-graphite-300">{m.provider}</td>
-                <td className="px-5 py-3">
+                <td style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{m.provider}</td>
+                <td style={{ padding: '10px 14px' }}>
                   <ModelHealthBadge status={m.health_status} />
                 </td>
-                <td className="px-5 py-3 text-graphite-300">
-                  {m.latency_ms ? `${m.latency_ms}ms` : "—"}
+                <td style={{ padding: '10px 14px', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-muted)', textAlign: 'right' }}>
+                  {m.latency_ms ? `${m.latency_ms}ms` : '—'}
                 </td>
-                <td className="px-5 py-3 text-graphite-300">
+                <td style={{ padding: '10px 14px', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-muted)', textAlign: 'right' }}>
                   {(m.context_window / 1000).toFixed(0)}K
                 </td>
-                <td className="px-5 py-3 font-mono text-xs text-graphite-300">
+                <td style={{ padding: '10px 14px', fontSize: 9, fontFamily: 'var(--mono)', color: 'var(--text-muted)', textAlign: 'right' }}>
                   ${Number(m.input_cost_per_1m).toFixed(2)} / ${Number(m.output_cost_per_1m).toFixed(2)}
                 </td>
-                <td className="px-5 py-3">
-                  <div className="flex flex-wrap gap-1">
+                <td style={{ padding: '10px 14px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {(m.capabilities || []).slice(0, 3).map((c) => (
-                      <span key={c} className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-400">
+                      <span key={c} style={{
+                        fontSize: 8, padding: '2px 6px', borderRadius: 3,
+                        background: 'var(--accent-dim)', color: 'var(--accent-light)', letterSpacing: '0.04em'
+                      }}>
                         {c}
                       </span>
                     ))}
                   </div>
                 </td>
-                <td className="px-5 py-3 text-graphite-300">{m.priority}</td>
-                <td className="px-5 py-3">
+                <td style={{ padding: '10px 14px', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-primary)', textAlign: 'center' }}>
+                  {m.priority}
+                </td>
+                <td style={{ padding: '10px 14px', textAlign: 'center' }}>
                   <button
                     onClick={() => toggleMutation.mutate({ id: m.id, enabled: !m.is_enabled })}
-                    className="flex items-center gap-1.5"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 8px', borderRadius: 4,
+                      border: '1px solid var(--border)', background: m.is_enabled ? 'rgba(78,155,92,0.12)' : 'rgba(255,255,255,0.05)',
+                      color: m.is_enabled ? 'var(--green)' : 'var(--text-muted)', fontSize: 9, cursor: 'pointer'
+                    }}
                   >
-                    <Power className={`h-4 w-4 ${m.is_enabled ? "text-emerald-400" : "text-graphite-400"}`} />
-                    <span className={`text-xs ${m.is_enabled ? "text-emerald-400" : "text-graphite-400"}`}>
-                      {m.is_enabled ? "Enabled" : "Disabled"}
-                    </span>
+                    <Power size={10} />
+                    {m.is_enabled ? 'Enabled' : 'Disabled'}
                   </button>
                 </td>
-                <td className="px-5 py-3">
+                <td style={{ padding: '10px 14px', textAlign: 'right' }}>
                   <button
                     onClick={() => healthMutation.mutate(m.id)}
-                    className="rounded-lg border border-white/10 p-1.5 text-graphite-300 transition hover:border-amber-500/40 hover:text-amber-400"
-                    title="Check health"
+                    style={{
+                      background: 'none', border: '1px solid var(--border)', borderRadius: 4,
+                      padding: '4px 6px', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.15s'
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'; }}
+                    title="Check model health"
                   >
-                    <Activity className="h-3.5 w-3.5" />
+                    <Activity size={12} />
                   </button>
                 </td>
-              </motion.tr>
+              </tr>
             ))}
           </tbody>
         </table>
-      </motion.div>
+      </div>
     </div>
   );
 }

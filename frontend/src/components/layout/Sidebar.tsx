@@ -46,7 +46,7 @@ export function Sidebar() {
   ];
 
   return (
-    <aside style={{
+    <aside className="sidebar-drawer" style={{
       width: 200, minWidth: 200,
       background: 'var(--bg-sidebar)',
       borderRight: '1px solid var(--border)',
