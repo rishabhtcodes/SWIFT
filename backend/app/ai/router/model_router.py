@@ -26,6 +26,13 @@ TASK_CAPABILITY_MAP = {
     "general": [],
 }
 
+# ─── Groq fallback models (used as last resort when ALL other providers fail) ──
+GROQ_FALLBACK_MODELS = [
+    "llama-3.1-8b-instant",       # Fastest, cheapest — try first
+    "llama-3.3-70b-versatile",    # Most capable — try second
+    "mixtral-8x7b-32768",         # Alternative — try third
+]
+
 
 class ModelRouter:
     def __init__(self):
@@ -99,10 +106,6 @@ class ModelRouter:
     async def select_model(self, session: AsyncSession, task_type: str = "general") -> dict[str, Any]:
         """Pick the best enabled model for a task type, with fallback."""
         cache_key = f"model_route:{task_type}"
-        # Cache temporarily disabled to force fresh DB read
-        # cached = await redis_client.get(cache_key)
-        # if cached:
-        #     return cached
 
         required = TASK_CAPABILITY_MAP.get(task_type, [])
         result = await session.execute(
@@ -136,19 +139,81 @@ class ModelRouter:
             "model_id": primary.model_id,
             "display_name": primary.display_name,
             "context_window": primary.context_window,
+            # Return all candidates so complete() can walk the fallback chain
+            "_all_candidates": [
+                {"provider": m.provider, "model_id": m.model_id}
+                for m in candidates
+            ],
         }
 
+    def _is_rate_limit_error(self, exc: Exception) -> bool:
+        """Detect 429 / rate-limit errors from any provider."""
+        msg = str(exc).lower()
+        return "429" in msg or "rate limit" in msg or "too many requests" in msg or "quota" in msg
+
     async def complete(self, session: AsyncSession, task_type: str, messages: list[ProviderMessage], **kwargs) -> Any:
+        """
+        Smart fallback chain:
+          1. Try primary model (from DB, highest priority)
+          2. Try remaining DB-registered models in priority order
+          3. Last resort: try Groq fallback models (llama-3.1-8b -> llama-3.3-70b -> mixtral)
+
+        On ANY 429 / rate-limit error the next provider is tried automatically.
+        Groq is ALWAYS available as the final guarantee.
+        """
+        import asyncio
+        import logging
+        logger = logging.getLogger("swift.model_router")
+
         selection = await self.select_model(session, task_type)
-        provider = self._get_provider(selection["provider"])
+        all_candidates = selection.pop("_all_candidates", [])
+
+        # --- Step 1: Try primary model ---
         try:
+            provider = self._get_provider(selection["provider"])
             return await provider.complete(selection["model_id"], messages, **kwargs)
         except Exception as e:
-            # Fallback
-            if selection.get("fallback_model_id"):
-                fallback_provider = self._get_provider(selection["provider"])
-                return await fallback_provider.complete(selection["fallback_model_id"], messages, **kwargs)
-            raise
+            if self._is_rate_limit_error(e):
+                logger.warning(f"[ModelRouter] Rate limit on {selection['provider']}/{selection['model_id']} - trying fallback chain")
+            else:
+                logger.warning(f"[ModelRouter] Error on {selection['provider']}/{selection['model_id']}: {e} - trying fallback chain")
+
+        # --- Step 2: Try remaining DB-registered models (skip the primary already tried) ---
+        tried = {(selection["provider"], selection["model_id"])}
+        for candidate in all_candidates:
+            key = (candidate["provider"], candidate["model_id"])
+            if key in tried:
+                continue
+            tried.add(key)
+            try:
+                logger.info(f"[ModelRouter] Fallback - trying {candidate['provider']}/{candidate['model_id']}")
+                await asyncio.sleep(0.5)  # Brief pause to avoid flooding
+                provider = self._get_provider(candidate["provider"])
+                return await provider.complete(candidate["model_id"], messages, **kwargs)
+            except Exception as e:
+                logger.warning(f"[ModelRouter] Fallback {candidate['provider']}/{candidate['model_id']} failed: {e}")
+
+        # --- Step 3: LAST RESORT - Groq fallback models ---
+        groq_provider = self._get_provider("groq")
+        for groq_model in GROQ_FALLBACK_MODELS:
+            if ("groq", groq_model) in tried:
+                continue
+            try:
+                logger.warning(f"[ModelRouter] Last-resort Groq fallback - {groq_model}")
+                await asyncio.sleep(1.0)  # Respect rate limits with a small pause
+                return await groq_provider.complete(groq_model, messages, **kwargs)
+            except Exception as e:
+                if self._is_rate_limit_error(e):
+                    logger.warning(f"[ModelRouter] Groq {groq_model} also rate-limited, trying next...")
+                    await asyncio.sleep(3.0)  # Longer pause before next groq model
+                    continue
+                logger.error(f"[ModelRouter] Groq {groq_model} error: {e}")
+
+        # All providers exhausted
+        raise RuntimeError(
+            "All AI providers are currently unavailable or rate-limited. "
+            "Please wait a moment and try again, or add additional API keys in Settings."
+        )
 
 
 from app.ai.router.providers.ollama_provider import OllamaProvider
