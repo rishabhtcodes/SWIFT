@@ -13,7 +13,11 @@ async def test():
             print("Doc ID:", doc_id)
         
         print("Sending chat...")
-        async with client.stream("POST", "http://localhost:8000/api/v1/chat/stream", json={"message": "What is the secret word in the attached document?", "document_id": doc_id}) as res:
+        async with client.stream("POST", "http://localhost:8000/api/v1/chat/stream", json={
+            "message": "What is the secret word in the attached document?",
+            "document_id": doc_id,
+            "model_override": "qwen/qwen3.6-27b"
+        }) as res:
             async for line in res.aiter_lines():
                 print(line)
 
