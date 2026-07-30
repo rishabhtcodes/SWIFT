@@ -15,7 +15,7 @@ router = APIRouter()
 async def get_dashboard_stats(session: AsyncSession = Depends(get_session)):
     # 1. System Overview
     agents_active = len(AGENT_MAP)
-    tools_available = len(tool_registry.tools)
+    tools_available = len(tool_registry._tools)
     
     # 2. Current Tasks
     tasks_result = await session.execute(
@@ -51,7 +51,7 @@ async def get_dashboard_stats(session: AsyncSession = Depends(get_session)):
         activity_formatted.append({
             "icon_type": "bot",
             "label": f"{r.agent_name.capitalize()} Agent {r.status}",
-            "time": r.started_at.strftime("%H:%M")
+            "time": r.started_at.strftime("%H:%M") if r.started_at else "00:00"
         })
         
     # 4. Memory Snapshot
