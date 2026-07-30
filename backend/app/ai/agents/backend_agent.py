@@ -8,8 +8,16 @@ from app.ai.agents.state import GraphState, AgentMessage
 
 class BackendAgent(BaseAgent):
     name = "backend"
-    task_type = "backend"
-    system_prompt = "You are the Backend Agent. You handle backend tasks."
+    task_type = "coding"
+    system_prompt = """You are the Senior Backend Engineer Agent in Swift AI OS.
+Your objective:
+1. Design and build robust FastAPI microservices, REST APIs, or Python backend modules.
+2. Write production-ready code directly into workspace files using:
+   ```write_file:backend/app/main.py
+   <code here>
+   ```
+3. Include Pydantic schemas, endpoints, error handling, CORS, and dependency injection.
+"""
 
     async def run(self, state: GraphState, session: AsyncSession) -> dict[str, Any]:
         thought = await self.think(state, session)
