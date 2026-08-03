@@ -70,6 +70,63 @@
                           │   FINAL SYNTHESIS   │
                           └─────────────────────┘
 ```
+```
+                           USER
+                             │
+                             ▼
+                 ┌──────────────────────┐
+                 │   Swift AI OS (UI)   │
+                 │ React + Tailwind CSS │
+                 └──────────────────────┘
+                             │
+                             ▼
+                 ┌──────────────────────┐
+                 │ FastAPI Backend API  │
+                 └──────────────────────┘
+                             │
+                             ▼
+              ┌─────────────────────────────┐
+              │ LangGraph Orchestrator       │
+              │ (Brain of Swift AI OS)       │
+              └─────────────────────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+ ┌────────────┐      ┌─────────────┐      ┌─────────────┐
+ │Model Router│      │Memory Engine│      │ RAG Engine  │
+ └────────────┘      └─────────────┘      └─────────────┘
+        │                    │                    │
+        │                    │                    │
+        ▼                    ▼                    ▼
+ Multiple LLMs        PostgreSQL          ChromaDB
+ (Gemini, Qwen,       User Memory         Embeddings
+ DeepSeek, etc.)      Chat History        Documents
+                                            PDFs
+                                            GitHub
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Multi-Agent System  │
+                  └─────────────────────┘
+                             │
+      ┌──────────┬──────────┬──────────┬──────────┐
+      ▼          ▼          ▼          ▼
+ Planner     Coding     Research    Vision
+ Agent        Agent       Agent      Agent
+      ▼          ▼          ▼          ▼
+ Memory     Testing     Docs      Deployment
+ Agent       Agent      Agent       Agent
+                             │
+                             ▼
+                    ┌───────────────────┐
+                    │ Tool Calling Hub  │
+                    └───────────────────┘
+                             │
+     ┌─────────┬────────┬────────┬────────┬────────┐
+     ▼         ▼        ▼        ▼        ▼
+  GitHub     Files    Browser  Terminal Database
+```
 
 ---
 
