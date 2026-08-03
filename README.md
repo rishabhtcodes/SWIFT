@@ -37,6 +37,15 @@
 
 **Swift AI OS** acts as an autonomous personal engineering AI operating system (JARVIS-class system). Unlike standard single-chat interfaces, Swift AI OS deploys a **graph of 14 specialized AI agents** that work together concurrently to analyze, decompose, design, code, test, document, and deploy full applications.
 
+<br />
+
+<div align="center">
+  <img src="docs/Screenshots/dashboard.png" alt="Swift AI OS Dashboard" width="95%" />
+  <p><i>Figure 1: Swift AI OS Central Command Dashboard & Agent Telemetry</i></p>
+</div>
+
+<br />
+
 ```
                   ┌─────────────────────────────────────┐
                   │              USER GOAL              │
@@ -199,7 +208,7 @@ This automatically initializes database tables, seeds default model registries, 
 
 ---
 
-## 🌐 Application Navigation Pages
+## 🌐 Application Navigation & Visual Showcase
 
 | Page | URL Route | Description |
 |---|---|---|
@@ -218,6 +227,103 @@ This automatically initializes database tables, seeds default model registries, 
 
 ---
 
+### 🖼️ Interface Showcase
+
+<details>
+<summary><b>📸 Click to view all System Screenshots & Visual Modules</b></summary>
+
+<br />
+
+#### 🎛️ 1. Multi-Agent Orchestration & Status
+<div align="center">
+  <img src="docs/Screenshots/agents.png" alt="Multi-Agent System" width="90%" />
+  <p><i>14 Specialist Agents actively registered in LangGraph Orchestrator</i></p>
+</div>
+
+---
+
+#### 💬 2. Conversational Agent Interface
+<div align="center">
+  <img src="docs/Screenshots/chat.png" alt="Interactive Chat" width="90%" />
+  <p><i>Interactive multi-agent chat interface with execution streaming</i></p>
+</div>
+
+---
+
+#### 🧠 3. Multi-Layer Memory Engine
+<div align="center">
+  <img src="docs/Screenshots/memory.png" alt="Memory Architecture" width="90%" />
+  <p><i>7-Layer Memory Architecture showing Episodic, Semantic, and Session memories</i></p>
+</div>
+
+---
+
+#### 📚 4. Knowledge Base & Vector RAG Store
+<div align="center">
+  <img src="docs/Screenshots/knowledge.png" alt="Knowledge Base" width="90%" />
+  <p><i>ChromaDB vector store document manager and chunk indexer</i></p>
+</div>
+
+---
+
+#### 🧰 5. Sandboxed Tool Execution Hub
+<div align="center">
+  <img src="docs/Screenshots/tools.png" alt="Sandboxed Tools" width="90%" />
+  <p><i>Available system tools: Browser automation, Terminal shell, Git, Python executor</i></p>
+</div>
+
+---
+
+#### 📁 6. Project & Workspace Manager
+<div align="center">
+  <img src="docs/Screenshots/projects.png" alt="Project Manager" width="90%" />
+  <p><i>Active project workspace, sprint breakdown, and multi-agent assignment</i></p>
+</div>
+
+---
+
+#### 🔌 7. Pluggable Model Manager & Telemetry
+<div align="center">
+  <img src="docs/Screenshots/model-manager.png" alt="Model Manager" width="90%" />
+  <p><i>Multi-provider model routing (Qwen, Gemini, DeepSeek, Groq, Ollama)</i></p>
+</div>
+
+---
+
+#### 🧩 8. Agent & Plugin Marketplace
+<div align="center">
+  <img src="docs/Screenshots/marketplace.png" alt="Marketplace" width="90%" />
+  <p><i>Community extensions, custom tools, and specialist agent downloads</i></p>
+</div>
+
+---
+
+#### 📊 9. Telemetry & Analytics Dashboard
+<div align="center">
+  <img src="docs/Screenshots/analytics.png" alt="Analytics Dashboard" width="90%" />
+  <p><i>Agent performance metrics, task success rate, and response latencies</i></p>
+</div>
+
+---
+
+#### 💻 10. Developer Terminal & Execution Console
+<div align="center">
+  <img src="docs/Screenshots/console.png" alt="Developer Console" width="90%" />
+  <p><i>Real-time system traces, raw model routing logs, and execution terminal</i></p>
+</div>
+
+---
+
+#### ⚙️ 11. System Configuration & Provider API Keys
+<div align="center">
+  <img src="docs/Screenshots/settings.png" alt="System Settings" width="90%" />
+  <p><i>Provider API keys management, default model selection, and endpoint configurations</i></p>
+</div>
+
+</details>
+
+---
+
 ## 👤 Developer & Maintainer
 
 - **Developer**: **Rishabh** ([@rishabhtcodes](https://github.com/rishabhtcodes))
@@ -231,3 +337,4 @@ This automatically initializes database tables, seeds default model registries, 
 *Built with passion, caffeine, and modern AI engineering by Rishabh.* ⚡
 
 </div>
+
