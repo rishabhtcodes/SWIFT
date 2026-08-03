@@ -46,95 +46,76 @@
 
 <br />
 
+---
+
+## 🏛️ System Architecture
+
+### 1. Multi-Agent Orchestration Flow (LangGraph Execution Pipeline)
+
+```mermaid
+flowchart TD
+    User([👤 USER PROMPT]) --> CEO[👑 CEO Agent / Intent Classifier]
+    CEO --> Planner[🗺️ Planner Agent / Architecture & Breakdown]
+    
+    subgraph ParallelExecution ["⚡ Concurrent Specialist Execution Layer"]
+        Planner --> Backend[⚙️ Backend Agent]
+        Planner --> Frontend[🎨 Frontend Agent]
+        Planner --> Database[🗄️ Database Agent]
+        Planner --> Research[🔍 Research & RAG Agent]
+        Planner --> Vision[👁️ Multimodal Vision Agent]
+    end
+    
+    Backend & Frontend & Database & Research & Vision --> QualityControl["🧪 Testing & DevOps Validation Layer"]
+    QualityControl --> Synthesis[✨ CEO Final Answer & Code Synthesis]
+    Synthesis --> Output([🚀 User Workspace & Interactive Response])
 ```
-                  ┌─────────────────────────────────────┐
-                  │              USER GOAL              │
-                  └──────────────────┬──────────────────┘
-                                     │
-                                     ▼
-                          ┌─────────────────────┐
-                          │      CEO AGENT      │
-                          └──────────┬──────────┘
-                                     │
-                                     ▼
-                          ┌─────────────────────┐
-                          │    PLANNER AGENT    │
-                          └──────────┬──────────┘
-                                     │
-         ┌───────────────────────────┼───────────────────────────┐
-         ▼                           ▼                           ▼
-┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│  BACKEND AGENT   │       │  FRONTEND AGENT  │       │  DATABASE AGENT  │
-└────────┬─────────┘       └────────┬─────────┘       └────────┬─────────┘
-         │                           │                           │
-         └───────────────────────────┼───────────────────────────┘
-                                     │
-                                     ▼
-                          ┌─────────────────────┐
-                          │  TESTING & DEVOPS   │
-                          └──────────┬──────────┘
-                                     │
-                                     ▼
-                          ┌─────────────────────┐
-                          │   FINAL SYNTHESIS   │
-                          └─────────────────────┘
-```
-```
-                           USER
-                             │
-                             ▼
-                 ┌──────────────────────┐
-                 │   Swift AI OS (UI)   │
-                 │ React + Tailwind CSS │
-                 └──────────────────────┘
-                             │
-                             ▼
-                 ┌──────────────────────┐
-                 │ FastAPI Backend API  │
-                 └──────────────────────┘
-                             │
-                             ▼
-              ┌─────────────────────────────┐
-              │ LangGraph Orchestrator       │
-              │ (Brain of Swift AI OS)       │
-              └─────────────────────────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
- ┌────────────┐      ┌─────────────┐      ┌─────────────┐
- │Model Router│      │Memory Engine│      │ RAG Engine  │
- └────────────┘      └─────────────┘      └─────────────┘
-        │                    │                    │
-        │                    │                    │
-        ▼                    ▼                    ▼
- Multiple LLMs        PostgreSQL          ChromaDB
- (Gemini, Qwen,       User Memory         Embeddings
- DeepSeek, etc.)      Chat History        Documents
-                                            PDFs
-                                            GitHub
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │ Multi-Agent System  │
-                  └─────────────────────┘
-                             │
-      ┌──────────┬──────────┬──────────┬──────────┐
-      ▼          ▼          ▼          ▼
- Planner     Coding     Research    Vision
- Agent        Agent       Agent      Agent
-      ▼          ▼          ▼          ▼
- Memory     Testing     Docs      Deployment
- Agent       Agent      Agent       Agent
-                             │
-                             ▼
-                    ┌───────────────────┐
-                    │ Tool Calling Hub  │
-                    └───────────────────┘
-                             │
-     ┌─────────┬────────┬────────┬────────┬────────┐
-     ▼         ▼        ▼        ▼        ▼
-  GitHub     Files    Browser  Terminal Database
+
+### 2. High-Level System Architecture & Component Interactions
+
+```mermaid
+graph TB
+    subgraph UI ["💻 Presentation Layer"]
+        ReactUI["React 18 + TypeScript + Tailwind CSS\n(Vite Dev Server :5173)"]
+    end
+
+    subgraph API ["⚡ API & Gateway Layer"]
+        FastAPI["FastAPI Async Server\n(Uvicorn :8000)"]
+    end
+
+    subgraph Core ["🧠 Brain & Orchestration Layer"]
+        LangGraph["LangGraph Multi-Agent Orchestrator\n(StateGraph + ReAct Execution Loop)"]
+        Router["Pluggable Model Router\n(Dynamic Model Selector & Cost Optimizer)"]
+    end
+
+    subgraph Storage ["💾 Data & Memory Layer"]
+        PostgreSQL[("PostgreSQL 16\n(Users, Chat History & Tasks)")]
+        ChromaDB[("ChromaDB Vector Store\n(RAG Embeddings & Docs)")]
+        SevenLayerMemory[("7-Layer Memory Engine\n(Short-term, Episodic & Semantic)")]
+    end
+
+    subgraph LLM ["🤖 Multi-Provider LLM Router Matrix"]
+        Qwen["DashScope (Qwen 3.7 Plus / VL)"]
+        Groq["Groq (Llama 3.3 70B / 3.1 8B)"]
+        Gemini["Google Gemini (2.0 Flash / 1.5 Pro)"]
+        DeepSeek["DeepSeek Chat (V3)"]
+        Ollama["Ollama (Local Llama 3.2)"]
+    end
+
+    subgraph Tools ["🧰 Sandboxed Tool Execution Engine"]
+        TerminalTool["Terminal / Shell Executor"]
+        FileTool["Workspace File Manager"]
+        BrowserTool["Playwright Browser Automation"]
+        SearchTool["Tavily & DuckDuckGo Web Search"]
+        GitTool["Git Version Control Tool"]
+    end
+
+    ReactUI <-->|REST API / WebSockets| FastAPI
+    FastAPI <--> LangGraph
+    LangGraph <--> Router
+    Router <--> Qwen & Groq & Gemini & DeepSeek & Ollama
+    LangGraph <--> SevenLayerMemory
+    SevenLayerMemory <--> PostgreSQL & ChromaDB
+    LangGraph <--> Tools
 ```
 
 ---
