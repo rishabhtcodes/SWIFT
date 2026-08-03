@@ -227,102 +227,138 @@ This automatically initializes database tables, seeds default model registries, 
 
 ---
 
-### 🖼️ Interface Showcase
+---
 
-<details>
-<summary><b>📸 Click to view all System Screenshots & Visual Modules</b></summary>
+## 🖼️ System Interface & Feature Review Walkthrough
 
-<br />
+Explore the complete visual tour and detailed capability review of each core module in **Swift AI OS**:
 
-#### 🎛️ 1. Multi-Agent Orchestration & Status
+### 📊 1. Command Dashboard & Real-Time Telemetry
 <div align="center">
-  <img src="docs/Screenshots/agents.png" alt="Multi-Agent System" width="90%" />
-  <p><i>14 Specialist Agents actively registered in LangGraph Orchestrator</i></p>
+  <img src="docs/Screenshots/dashboard.png" alt="Command Dashboard" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Unified Workspace**: Quick prompt triggers for Code, Research, Memory, and Task Automation.
+> - **Live Agent Activity**: Real-time log feeds tracking CEO, Planner, Coding, and Research agent execution completions.
+> - **System Metrics**: Live CPU, Memory, Storage hardware telemetry alongside active agent and tool counts.
 
 ---
 
-#### 💬 2. Conversational Agent Interface
+### 🎛️ 2. Multi-Agent Orchestration Engine (`/agents`)
 <div align="center">
-  <img src="docs/Screenshots/chat.png" alt="Interactive Chat" width="90%" />
-  <p><i>Interactive multi-agent chat interface with execution streaming</i></p>
+  <img src="docs/Screenshots/agents.png" alt="Multi-Agent System" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **14 Specialist Agents**: Live status dashboard displaying model assignments (Qwen 3.7 Plus, Llama 3.3 70B, DeepSeek Chat, Gemini 2.0 Flash, etc.).
+> - **Task Counters**: Individual completed task counters for every specialist agent in the LangGraph network.
 
 ---
 
-#### 🧠 3. Multi-Layer Memory Engine
+### 💬 3. Autonomous Conversational Interface (`/chat`)
 <div align="center">
-  <img src="docs/Screenshots/memory.png" alt="Memory Architecture" width="90%" />
-  <p><i>7-Layer Memory Architecture showing Episodic, Semantic, and Session memories</i></p>
+  <img src="docs/Screenshots/chat.png" alt="Interactive Chat Interface" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Multi-Turn Orchestration**: Interactive chat powered by the autonomous multi-agent graph with tool attachment options.
+> - **Streaming Output**: Real-time thoughts, code snippet rendering, and multi-agent delegation feedback.
 
 ---
 
-#### 📚 4. Knowledge Base & Vector RAG Store
+### 🧠 4. 7-Layer Memory System (`/memory`)
 <div align="center">
-  <img src="docs/Screenshots/knowledge.png" alt="Knowledge Base" width="90%" />
-  <p><i>ChromaDB vector store document manager and chunk indexer</i></p>
+  <img src="docs/Screenshots/memory.png" alt="Memory System" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Multi-Tier Persistence**: Real-time capacity indicators for Short-Term (In-Process), Episodic (SQLite 30-day), Semantic (ChromaDB Vector), and Conversation histories.
+> - **Indexed Knowledge**: Aggregated stats for total memory chunks, conversation threads, indexed files, and extracted user facts.
 
 ---
 
-#### 🧰 5. Sandboxed Tool Execution Hub
+### 📚 5. Vector RAG Knowledge Base (`/knowledge`)
 <div align="center">
-  <img src="docs/Screenshots/tools.png" alt="Sandboxed Tools" width="90%" />
-  <p><i>Available system tools: Browser automation, Terminal shell, Git, Python executor</i></p>
+  <img src="docs/Screenshots/knowledge.png" alt="Knowledge Base RAG" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Document Indexing**: ChromaDB vector store indexing for FastAPI documentation, LangGraph guides, and Markdown project requirements.
+> - **One-Click Ingestion**: Upload custom PDFs, Word docs, text files, or remote GitHub repositories directly into vector memory.
 
 ---
 
-#### 📁 6. Project & Workspace Manager
+### 🧰 6. Sandboxed Tool Execution Hub (`/tools`)
 <div align="center">
-  <img src="docs/Screenshots/projects.png" alt="Project Manager" width="90%" />
-  <p><i>Active project workspace, sprint breakdown, and multi-agent assignment</i></p>
+  <img src="docs/Screenshots/tools.png" alt="Tools Catalog" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **7 Core System Tools**: Autonomous web search (DuckDuckGo & Tavily), Python/JS Code Runner, Workspace File System, Git tools, Playwright Browser automation, Terminal shell execution, and REST API caller.
 
 ---
 
-#### 🔌 7. Pluggable Model Manager & Telemetry
+### 📁 7. Project & Workspace Manager (`/projects`)
 <div align="center">
-  <img src="docs/Screenshots/model-manager.png" alt="Model Manager" width="90%" />
-  <p><i>Multi-provider model routing (Qwen, Gemini, DeepSeek, Groq, Ollama)</i></p>
+  <img src="docs/Screenshots/projects.png" alt="Project Manager" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Multi-Project Workspace**: Management dashboard for concurrent software engineering projects with progress tracking bars and dedicated agent allocations.
 
 ---
 
-#### 🧩 8. Agent & Plugin Marketplace
+### 🔌 8. Pluggable Model Router & Manager (`/models`)
 <div align="center">
-  <img src="docs/Screenshots/marketplace.png" alt="Marketplace" width="90%" />
-  <p><i>Community extensions, custom tools, and specialist agent downloads</i></p>
+  <img src="docs/Screenshots/model-manager.png" alt="Model Manager" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **LLM Router Matrix**: Live status, health monitoring, context window sizes, priority scores, capability tags (reasoning, coding, vision, planning), and pricing telemetries across Qwen, Gemini, DeepSeek, Groq, and Ollama.
 
 ---
 
-#### 📊 9. Telemetry & Analytics Dashboard
+### 🧩 9. Agent & Plugin Marketplace (`/marketplace`)
 <div align="center">
-  <img src="docs/Screenshots/analytics.png" alt="Analytics Dashboard" width="90%" />
-  <p><i>Agent performance metrics, task success rate, and response latencies</i></p>
+  <img src="docs/Screenshots/marketplace.png" alt="Agent Marketplace" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **Extensible Architecture**: One-click install for community extensions such as *AutoCoder Pro*, *ResearchBot*, *DataAnalyzer*, and *DocWriter*.
 
 ---
 
-#### 💻 10. Developer Terminal & Execution Console
+### 📊 10. Performance & Analytics Dashboard (`/analytics`)
 <div align="center">
-  <img src="docs/Screenshots/console.png" alt="Developer Console" width="90%" />
-  <p><i>Real-time system traces, raw model routing logs, and execution terminal</i></p>
+  <img src="docs/Screenshots/analytics.png" alt="Analytics Dashboard" width="100%" />
 </div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **System Metrics**: Completed task counts, average response latencies (e.g. 2.4s), overall success rate (97.3%), and daily volume trends.
 
 ---
 
-#### ⚙️ 11. System Configuration & Provider API Keys
+### 💻 11. Real-Time Developer Console (`/console`)
 <div align="center">
-  <img src="docs/Screenshots/settings.png" alt="System Settings" width="90%" />
-  <p><i>Provider API keys management, default model selection, and endpoint configurations</i></p>
+  <img src="docs/Screenshots/console.png" alt="Developer Console" width="100%" />
 </div>
 
-</details>
+> **🔍 Feature Review & Capabilities:**
+> - **Live Agent Traces**: Integrated terminal view showing active agent status, model routing events, pluggable provider initialization, and diagnostics shell.
 
 ---
+
+### ⚙️ 12. Provider Configuration & Settings (`/settings`)
+<div align="center">
+  <img src="docs/Screenshots/settings.png" alt="Settings Page" width="100%" />
+</div>
+
+> **🔍 Feature Review & Capabilities:**
+> - **API Key Management**: Secure configuration inputs for Groq, Google AI, OpenAI, and Anthropic API keys, backend/frontend URLs, and default model selection.
+
+---
+
 
 ## 👤 Developer & Maintainer
 
